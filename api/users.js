@@ -1,15 +1,13 @@
-const { Pool } = require('pg');
+const { PrismaClient } = require('@prisma/client');
+const cors = require('cors');
 
-const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
-  ssl: { rejectUnauthorized: false }
-});
+const prisma = new PrismaClient();
 
-module.exports = async (req, res) => {
+module.exports = cors()(async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM users');
-    res.json(result.rows);
+    const users = await prisma.user.findMany();
+    res.json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+});
